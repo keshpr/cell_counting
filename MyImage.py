@@ -62,13 +62,18 @@ class MyImage:
             ret, self.threshed = cv2.threshold(gray, threshold_val, 255, cv2.THRESH_BINARY)
         else:
             ret, self.threshed = cv2.threshold(gray, threshold_val, 255, cv2.THRESH_BINARY)
-        
+        return
+
+    """
+    This function becomes unnecessary if we decide to go with the new route, but let's 
+    just leave it here for now.
+    """
     def is_in_cluster(x,y,as_x, as_y):
         assert as_x >=0 and as_x <= self.box_size and as_y >= 0 and as_y <= self.box_size
         
         this_color = self.img[x,y]
         clsts_num_dict = collections.Counter()
-        x_init, y_init = x - x_as, y - y_as
+        x_init, y_init = x - as_x, y - as_y
         x_end = x_init + self.box_size, y_init + self.box_size
         for i in range(x_init, x_end + 1):
             for j in range(y_init, y_end + 1):
@@ -95,36 +100,38 @@ class MyImage:
                 if(not self.img[x + i, y + j] == this_color):
                     return False
         return True
-  
-    def get_clusters():
-        #num_centers = get_centers()
-        while(not centers.empty()):
-            x,y,cluster_number = centers.get()
-            for i in [-3,0,3]:
-                for j in [-3,0,3]:
-                    if(i < 0 or j < 0 or i >= self.img.shape[0] or j >= self.img.shape[1]):
-                        continue
-                    if(self.img[x + i, y + j] == BLACK and i > -3 and i < 3 and j > -3 and j < 3):
-                        self.cluster_img[x + i, y + j] = cluster_number
-                    elif(self.img[x + i, y + j] == BLACK):
-                        pixels_to_proc.put([x+i, y+j])
-                    else:
-                        self.cluster_img[x + i, y + j] = 1
-                    
-        return
-    """    
-      def get_centers():
-        x_min, y_min = 2,2
-        x_max, y_max = self.img.shape - 2
-        num_centers = 0
-        for i in range(x_min, x_max + 1):
-            for j in range(y_min, y_max + 1):
-                if(is_center(i,j)):
-                    self.centers.put([i,j, num_centers + 2])
-                    num_centers += 1
-        return num_centers
-    """  
 
+    """
+    Given pixel (x, y)
+    Find a cluster center. Add every pixel touching it to the cluster, add them to the queue.
+    Now, go to a newly clustered pixel, and look at everything touching this pixel. 
+    If all of the same color, and are either unclustered or of the same cluster as current cluster, 
+    then cluster all those, and add them to the queue to be "processed"
+    Else, don't add any to the queue, don't cluster those. Continue with next pixel in queue
+
+    So, given the pixel, must cluster around this pixel
+
+    Eventual TODOs: maybe decrease the strictness of condition for adding pixels to the current 
+    cluster, but this is more polish than requirement for now. 
+    """
+    def cluster_around_this_pixel(x,y):
+        #TODO
+        return
+
+
+
+    """
+    Function that gives every pixel a cluster number. This is done by
+    changing the value of pixels in cluster_img
+    For eg, if pixel (x,y) were in cluster 5, then cluster_img[x,y] = 5
+    0 - unclustered. Every other number stands for a cluster number.
+    
+    Perform this by implementing DBSCAN
+    """
+    def get_clusters():
+        # TODO
+        return
+        
 
 # In[9]:
 

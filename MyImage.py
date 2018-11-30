@@ -39,22 +39,22 @@ class MyImage:
         #self.curr_cluster = 0
         return
     
-    def add_pixel_to_cluster(x_curr, y_curr, x, y):
+    def add_pixel_to_cluster(self, x_curr, y_curr, x, y):
         self.cluster_img[x_curr,y_curr] = self.cluster_img[x,y]
         return
     
-    def add_pixel_to_cluster(x,y):
+    def add_pixel_to_cluster(self, x,y):
         #self.curr_cluster += 1
         self.num_clusters += 1
         self.cluster_img[x,y] = self.num_clusters
         return
     
-    def pixels_are_similar(x1,y1,x2,y2, eps):
+    def pixels_are_similar(self, x1,y1,x2,y2, eps):
         pix1, pix2  = self.img[x1,y1], self.img[x2,y2]
         dist = math.sqrt(np.sum((pix1-pix2)**2))
         return dist <= eps
     
-    def threshold(method, threshold_val = 0):
+    def threshold(self, method, threshold_val = 0):
         gray = cv2.cvtColor(self.img,cv2.COLOR_BGR2GRAY)
         if(method == THRESHOLD_OTSU):
             ret, self.threshed = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
@@ -68,7 +68,7 @@ class MyImage:
     This function becomes unnecessary if we decide to go with the new route, but let's 
     just leave it here for now.
     """
-    def is_in_cluster(x,y,as_x, as_y):
+    def is_in_cluster(self, x,y,as_x, as_y):
         assert as_x >=0 and as_x <= self.box_size and as_y >= 0 and as_y <= self.box_size
         
         this_color = self.img[x,y]
@@ -91,7 +91,7 @@ class MyImage:
         
         return False, (-1,-1)
     
-    def is_center(x,y):
+    def is_center(self, x,y):
         this_color = self.img[x,y]
         for i in range(-self.center_box_size, self.center_box_size + 1):
             for j in range(-self.center_box_size, self.center_box_size + 1):
@@ -114,7 +114,7 @@ class MyImage:
     Eventual TODOs: maybe decrease the strictness of condition for adding pixels to the current 
     cluster, but this is more polish than requirement for now. 
     """
-    def cluster_around_this_pixel(x,y):
+    def cluster_around_this_pixel(self, x,y):
         #TODO
         return
 
@@ -128,7 +128,7 @@ class MyImage:
     
     Perform this by implementing DBSCAN
     """
-    def get_clusters():
+    def get_clusters(self):
         # TODO
         return
         
@@ -146,7 +146,7 @@ x.img.shape
 
 # In[10]:
 
-
+"""
 plt.imshow(x.img[100:150, 200:250], cmap = "gray")
 
 
@@ -248,3 +248,4 @@ print(_)
 
 
 
+"""

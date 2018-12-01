@@ -43,7 +43,7 @@ class MyImage:
         self.cluster_img[x_curr,y_curr] = self.cluster_img[x,y]
         return
     
-    def add_pixel_to_cluster(self, x,y):
+    def add_pixel_to_next_cluster(self, x,y):
         #self.curr_cluster += 1
         self.num_clusters += 1
         self.cluster_img[x,y] = self.num_clusters

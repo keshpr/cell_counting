@@ -153,7 +153,7 @@ class MyImage:
                             self.add_pixel_to_cluster(x_surr, y_surr, x, y)
                             coord = (x_surr, y_surr)
                             self.pixels_to_proc.put(coord)
-                    while !self.pixels_to_proc.empty():
+                    while not self.pixels_to_proc.empty():
                         coord = self.pixels_to_proc.get(0)
                         cluster_around_this_pixel(coord[0], coord[1])
                     
@@ -169,7 +169,7 @@ class MyImage:
         # else label as noise
         # if point is dense part of cluster, it's E-neighborhood also part of cluster
         #  then get new unvisited point...and so on
-        for 
+        
         
 
 # In[9]:

@@ -26,14 +26,14 @@ class MyImage:
     BLACK = 0
     WHITE = 255
     MIN_CLUSTER_PIXEL_NUM = 6
-    MINPOINTS = 5 # min points requied to form a dense region
+    MINPOINTS = 5 # min points requied to form a dense region, can change later
     
     def __init__(self, img_path, box_size = 2, box_pixel_leeway = 2, center_box_size = 1):
         self.img = cv2.imread(img_path)
-        self.cluster_img = np.zeros((self.img.shape[0], self.img.shape[1]))
+        self.cluster_img = np.zeros((self.img.shape[0], self.img.shape[1])) # ...what
         self.num_clusters = 0
         self.centers = q.Queue()
-        self.pixels_to_proc = q.Queue()
+        self.pixels_to_proc = q.Queue() # pixels in current cluster to process (?)
         self.box_size = box_size
         self.box_pixel_leeway = box_pixel_leeway
         self.min_cluster_pixel_num = (self.box_size+1)**2 - self.box_pixel_leeway
@@ -117,8 +117,8 @@ class MyImage:
     Eventual TODOs: maybe decrease the strictness of condition for adding pixels to the current 
     cluster, but this is more polish than requirement for now. 
     """
-    def cluster_around_this_pixel(self, x,y):
-        #TODO
+    def cluster_around_this_pixel(self, x, y):
+        # TODO
         return
 
 
@@ -133,19 +133,43 @@ class MyImage:
     """
     
     # this is where you're working
-    def get_clusters(self, MINPOINTS):
-        
+    # i'm probably missing 50000 edge cases and pieces of logic rip
+    def get_clusters(self):
+        # take care of pixel that's already clustered
+        # find center, make cluster around center, then call cluster_around_this_pixel
         # start w arbitrary point that hasn't been visited
         # TODO: find way to pick random pt. hardcoded for now
-        rand_x = 2; 
-        rand_y = 2;
+        for x in range(0, self.img.shape[0]):
+            for y in range(0, self.img.shape[1]):
+                if self.cluster_img[x][y] == 0 and self.is_center(x, y): 
+                    # if is a center and hasn't been clustered at all yet, make new cluster and get its cluster!
+                    self.add_pixel_to_next_cluster(x, y)
+                    # add all pixels around to current cluster
+
+                    for x_surr in range(x - 1, x + 2):
+                        for y_surr in range(y - 1, y + 2):
+                            if x_surr < 0 or x_surr >= self.img.shape[0] or y_surr < 0 or y_surr >= self.img.shape[1]:
+                                continue
+                            self.add_pixel_to_cluster(x_surr, y_surr, x, y)
+                            coord = (x_surr, y_surr)
+                            self.pixels_to_proc.put(coord)
+                    while !self.pixels_to_proc.empty():
+                        coord = self.pixels_to_proc.get(0)
+                        cluster_around_this_pixel(coord[0], coord[1])
+                    
+                else:
+                    # it's noise
+                    continue
+        
+
+
 
         # TODO: retrieve neighborhood.
         # if sufficient points (use MINPOINTS), define cluster
         # else label as noise
         # if point is dense part of cluster, it's E-neighborhood also part of cluster
         #  then get new unvisited point...and so on
-        return
+        
         
 
 # In[9]:

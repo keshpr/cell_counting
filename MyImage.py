@@ -132,8 +132,7 @@ class MyImage:
     Perform this by implementing DBSCAN
     """
     
-    # this is where you're working
-    # i'm probably missing 50000 edge cases and pieces of logic rip
+ 
     def get_clusters(self):
         # take care of pixel that's already clustered
         # find center, make cluster around center, then call cluster_around_this_pixel

@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# pylint: disable=C
+
 # In[1]:
 
 
@@ -24,6 +26,7 @@ class MyImage:
     BLACK = 0
     WHITE = 255
     MIN_CLUSTER_PIXEL_NUM = 6
+    MINPOINTS = 5 # min points requied to form a dense region
     
     def __init__(self, img_path, box_size = 2, box_pixel_leeway = 2, center_box_size = 1):
         self.img = cv2.imread(img_path)
@@ -56,9 +59,9 @@ class MyImage:
     
     def threshold(self, method, threshold_val = 0):
         gray = cv2.cvtColor(self.img,cv2.COLOR_BGR2GRAY)
-        if(method == THRESHOLD_OTSU):
+        if(method == self.THRESHOLD_OTSU):
             ret, self.threshed = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        elif(method == THRESHOLD_BINARY):
+        elif(method == self.THRESHOLD_BINARY):
             ret, self.threshed = cv2.threshold(gray, threshold_val, 255, cv2.THRESH_BINARY)
         else:
             ret, self.threshed = cv2.threshold(gray, threshold_val, 255, cv2.THRESH_BINARY)
@@ -74,7 +77,7 @@ class MyImage:
         this_color = self.img[x,y]
         clsts_num_dict = collections.Counter()
         x_init, y_init = x - as_x, y - as_y
-        x_end = x_init + self.box_size, y_init + self.box_size
+        x_end, y_end = x_init + self.box_size, y_init + self.box_size
         for i in range(x_init, x_end + 1):
             for j in range(y_init, y_end + 1):
                 if(i < 0 or j < 0 or i >= self.img.shape[0] or j >= self.img.shape[1]):
@@ -128,8 +131,20 @@ class MyImage:
     
     Perform this by implementing DBSCAN
     """
-    def get_clusters(self):
-        # TODO
+    
+    # this is where you're working
+    def get_clusters(self, MINPOINTS):
+        
+        # start w arbitrary point that hasn't been visited
+        # TODO: find way to pick random pt. hardcoded for now
+        rand_x = 2; 
+        rand_y = 2;
+
+        # TODO: retrieve neighborhood.
+        # if sufficient points (use MINPOINTS), define cluster
+        # else label as noise
+        # if point is dense part of cluster, it's E-neighborhood also part of cluster
+        #  then get new unvisited point...and so on
         return
         
 

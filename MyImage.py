@@ -13,9 +13,15 @@ import cv2
 import math
 import queue as q
 import collections
-
+import enum
 
 # In[7]:
+
+class Direction(enum.Enum):
+    UP = 1
+    RIGHT = 2
+    DOWN = 3
+    LEFT = 4
 
 
 class MyImage:
@@ -117,8 +123,41 @@ class MyImage:
     Eventual TODOs: maybe decrease the strictness of condition for adding pixels to the current 
     cluster, but this is more polish than requirement for now. 
     """
+
+    # TODO: Test function
     def cluster_around_this_pixel(self, x, y):
-        # TODO
+        assert x >=0 and x <= self.box_size and y >= 0 and y <= self.box_size
+
+        # TODO: Test indexing
+        # TOOD: Look into including diagonal neighbors
+        def get_neighbor_pos(dir, x, y):
+            assert dir in Direction
+            if dir == Direction.UP:
+                if y > 0:
+                    return x, y-1
+                return -1, -1
+            elif dir == Direction.RIGHT:
+                if x < self.box_size:
+                    return x+1, y
+                retunr -1, -1
+            elif dir == Direction.DOWN:
+                if y < self.box_size:
+                    return x, y+1
+                return -1, -1
+            else:
+                if x > 0:
+                    return x-1, y
+                return -1, -1
+
+        pixel_color = self.img[x,y]
+        for dir in Direction:
+            new_x, new_y = get_neighbor_pos(dir, x, y)
+            if new_x == new_y == -1:
+                continue
+            # TODO: Look into alternative conditions for deciding to cluster
+            elif self.img[new_x,new_y] == pixel_color:
+                self.add_pixel_to_cluster(new_x, new_y, x, y)
+                self.pixels_to_proc.put((new_x, new_y))
         return
 
 

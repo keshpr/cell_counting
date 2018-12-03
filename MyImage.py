@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# pylint: disable=C
-
 # In[1]:
 
 
@@ -34,7 +32,6 @@ class MyImage:
     BLACK = 0
     WHITE = 255
     MIN_CLUSTER_PIXEL_NUM = 6
-    MINPOINTS = 5 # min points requied to form a dense region, can change later
     
     def __init__(self, img_path, box_size = 2, box_pixel_leeway = 2, center_box_size = 1):
         self.img = cv2.imread(img_path)
@@ -183,10 +180,6 @@ class MyImage:
     
  
     def get_clusters(self):
-        # take care of pixel that's already clustered
-        # find center, make cluster around center, then call cluster_around_this_pixel
-        # start w arbitrary point that hasn't been visited
-        # TODO: find way to pick random pt. hardcoded for now
         for x in range(0, self.img.shape[0]):
             for y in range(0, self.img.shape[1]):
                 if self.cluster_img[x][y] == 0 and self.is_center(x, y): 
@@ -196,6 +189,8 @@ class MyImage:
 
                     for x_surr in range(x - 1, x + 2):
                         for y_surr in range(y - 1, y + 2):
+                            if x_surr = x and y_surr = y:
+                                continue # can skip analyzing itself
                             if x_surr < 0 or x_surr >= self.img.shape[0] or y_surr < 0 or y_surr >= self.img.shape[1]:
                                 continue
                             self.add_pixel_to_cluster(x_surr, y_surr, x, y)

@@ -23,12 +23,14 @@ class Direction(enum.Enum):
     DOWN = 3
     LEFT = 4
 
+class Threshold(enum.Enum):
+    OTSU = 1
+    BINARY = 2
+    ADAPTIVE_GAUSSIAN = 3
+    ADAPTIVE_MEAN = 4
 
 class MyImage:
     eps = 3
-    THRESHOLD_OTSU = 1
-    THRESHOLD_BINARY = 2
-    THRESHOLD_ADAPTIVE_GAUSSIAN = 3
     BLACK = 0
     WHITE = 255
     MIN_CLUSTER_PIXEL_NUM = 6
@@ -37,6 +39,7 @@ class MyImage:
     def __init__(self, img_path, box_size = 2, box_pixel_leeway = 2, center_box_size = 1):
         self.img = cv2.imread(img_path)
         self.cluster_img = np.zeros((self.img.shape[0], self.img.shape[1])) # ...what
+        self.threshed = np.zeros((self.img.shape[0], self.img.shape[1]))
         self.num_clusters = 0
         self.centers = q.Queue()
         self.pixels_to_proc = q.Queue() # pixels in current cluster to process (?)
@@ -46,6 +49,8 @@ class MyImage:
         assert self.min_cluster_pixel_num > 0
         self.center_box_size = center_box_size
         #self.curr_cluster = 0
+
+        self.threshold(Threshold.ADAPTIVE_GAUSSIAN)
         return
     
     def add_pixel_to_cluster(self, x_curr, y_curr, x, y):
@@ -63,14 +68,19 @@ class MyImage:
         dist = math.sqrt(np.sum((pix1-pix2)**2))
         return dist <= eps
     
-    def threshold(self, method, threshold_val = 0):
+    def threshold(self, method, threshold_val = 70):
         gray = cv2.cvtColor(self.img,cv2.COLOR_BGR2GRAY)
-        if(method == self.THRESHOLD_OTSU):
+        if(method == Threshold.OTSU):
             ret, self.threshed = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        elif(method == self.THRESHOLD_BINARY):
+        elif(method == Threshold.BINARY):
             ret, self.threshed = cv2.threshold(gray, threshold_val, 255, cv2.THRESH_BINARY)
-        else:
-            ret, self.threshed = cv2.threshold(gray, threshold_val, 255, cv2.THRESH_BINARY)
+        elif(method == Threshold.ADAPTIVE_GAUSSIAN):
+            self.threshed = cv.adaptiveThreshold(img,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,\
+                                                 cv.THRESH_BINARY,11,2)
+        elif(method == Threshold.ADAPTIVE_MEAN):
+            self.threshed = cv.adaptiveThreshold(img,255,cv.ADAPTIVE_THRESH_MEAN_C,\
+                                                 cv.THRESH_BINARY,11,2)
+        assert(self.threshed.shape == self.img.shape)
         return
 
     """
@@ -101,12 +111,12 @@ class MyImage:
         return False, (-1,-1)
     
     def is_center(self, x,y):
-        this_color = self.img[x,y]
+        this_color = self.threshed[x,y]
         for i in range(-self.center_box_size, self.center_box_size + 1):
             for j in range(-self.center_box_size, self.center_box_size + 1):
                 if(x+i < 0 or x+i >= self.img.shape[0] or y+j < 0 or y+j >= self.img.shape[1]):
                     return False
-                if(not self.img[x + i, y + j] == this_color):
+                if(not self.threshed[x + i, y + j] == this_color):
                     return False
         return True
 
@@ -149,13 +159,13 @@ class MyImage:
                     return x-1, y
                 return -1, -1
 
-        pixel_color = self.img[x,y]
+        pixel_color = self.thresehd[x,y]
         for dir in Direction:
             new_x, new_y = get_neighbor_pos(dir, x, y)
             if new_x == new_y == -1:
                 continue
             # TODO: Look into alternative conditions for deciding to cluster
-            elif self.cluster_img[new_x,new_y] == 0 and self.img[new_x,new_y] == pixel_color:
+            elif self.cluster_img[new_x,new_y] == 0 and self.threshed[new_x,new_y] == pixel_color:
                 self.add_pixel_to_cluster(new_x, new_y, x, y)
                 self.pixels_to_proc.put((new_x, new_y))
         return
@@ -192,7 +202,7 @@ class MyImage:
                             coord = (x_surr, y_surr)
                             self.pixels_to_proc.put(coord)
                     while not self.pixels_to_proc.empty():
-                        coord = self.pixels_to_proc.get(0)
+                        coord = self.pixels_to_proc.get()
                         cluster_around_this_pixel(coord[0], coord[1])
                     
                 else:

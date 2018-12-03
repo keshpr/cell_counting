@@ -126,7 +126,7 @@ class MyImage:
 
     # TODO: Test function
     def cluster_around_this_pixel(self, x, y):
-        assert x >=0 and x <= self.box_size and y >= 0 and y <= self.box_size
+        assert x >=0 and x < self.img.shape[0] and y >= 0 and y < self.img.shape[1]
 
         # TODO: Test indexing
         # TOOD: Look into including diagonal neighbors
@@ -155,7 +155,7 @@ class MyImage:
             if new_x == new_y == -1:
                 continue
             # TODO: Look into alternative conditions for deciding to cluster
-            elif self.img[new_x,new_y] == pixel_color:
+            elif self.cluster_img[new_x,new_y] == 0 and self.img[new_x,new_y] == pixel_color:
                 self.add_pixel_to_cluster(new_x, new_y, x, y)
                 self.pixels_to_proc.put((new_x, new_y))
         return

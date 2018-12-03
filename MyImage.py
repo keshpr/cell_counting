@@ -204,14 +204,6 @@ class MyImage:
                     # it's noise
                     continue
         
-
-
-
-        # TODO: retrieve neighborhood.
-        # if sufficient points (use MINPOINTS), define cluster
-        # else label as noise
-        # if point is dense part of cluster, it's E-neighborhood also part of cluster
-        #  then get new unvisited point...and so on
         
         
 

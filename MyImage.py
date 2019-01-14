@@ -146,7 +146,7 @@ class MyImage:
             elif dir == Direction.RIGHT:
                 if x < self.box_size:
                     return x+1, y
-                retunr -1, -1
+                return -1, -1
             elif dir == Direction.DOWN:
                 if y < self.box_size:
                     return x, y+1
